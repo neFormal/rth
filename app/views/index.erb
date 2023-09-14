@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF=8">
+    <title>Hi,dude!</title>
+    <link rel="stylesheet" type="text/css" href="stylesheets/styles.css" />
+  </head>
+  <body>
+    <h1>hello world</h1>
+    <script type="text/javascript" src="http://yandex.st/jquery/1.6.0/jquery.min.js"></script>
+
+    <script type="text/javascript">
+      function listen(game, username) {
+//      setTimeout(function () { // Ставлю именно таймаут, а не $.ready иначе у вебкитов будет бесконечная загрузка
+      // Создаем EventSource
+      var eventSrc = new EventSource("/stream?game=" + game + "&user=" + username);
+      
+      // Слушаем событие EventSource - "message"
+      eventSrc.addEventListener("message", function(event) {
+      console.log(event.data);
+      var data = JSON.parse(event.data);
+      // Отрисовываем пришедшее с сервера сообщение
+      //renderMessage(data);
+//      alert(window.localStorage['name'] + " - " + data.toString());
+      }, false);
+
+//      source.addEventListener('open', function(e) {
+      // Connection was opened.
+//      }, false);
+      
+//      source.addEventListener('error', function(e) {
+//      if (e.readyState == EventSource.CLOSED) {
+      // Connection was closed.
+//      }
+//      }, false);
+
+//      }, 50);
+      }
+      
+      ////////////////////////////////////////////////////////////////
+      
+      function create(){
+      var name = (prompt('Name:', window.localStorage ? window.localStorage['name'] || '' : '') || 'anonymous').substr(0, 20);
+      
+      // Пытаемся сохранить имя
+      if (window.localStorage) {
+      window.localStorage['create_name'] = name;
+      }
+      //        location.replace('/');
+      //        window.location = '/?action=create&name=' + name
+      //        window.location = '/game.php?action=create&game=passed&user=' + name
+      text = $.get('/?action=create&game=testgame&user='+name)
+//      text = JSON.parse(text);
+//      alert(text);
+      
+//      text = $.ajax({
+//      url: "/game.php",
+//      async: false
+//      }).responseText;
+//      alert(text);
+      listen('testgame', name);
+      }
+
+      function join() {
+      var name = (prompt('Name:', window.localStorage ? window.localStorage['name'] || '' : '') || 'anonymous').substr(0, 20);
+      // Пытаемся сохранить имя
+      if (window.localStorage) {
+      window.localStorage['join_name'] = name;
+      }
+      listen('testgame', name);
+      text = $.get('/?action=join&game=testgame&user='+name)
+//      alert(text);
+      }
+    </script>
+    
+    <input type="text" />
+
+    <button onclick="create()">Create</button>
+    <button onclick="join()">Join</button>
+<!--
+    <div id='lobbies'>
+      <div id='lobby123'>
+	<ol id='ol123'>
+	  <li>Jack</li>
+	  <li>Mike</li>
+	  <li>Billy</li>
+	</ol>
+	<button onClick="join(123)">Join</button>
+      </div>
+      
+      <div id='lobby124'>
+	<ol>
+	  <li>Steve</li>
+	  <li>Jason</li>
+	  <li>Harry</li>
+	</ol>
+	<button onClick="join(124)">Join</button>
+      </div>
+    </div>
+-->
+    <div id="chat">
+        <div>Welcome to EventSource Chat!</div>
+    </div>
+    
+    <script type="text/javascript">
+/*    setTimeout(function () { // Ставлю именно таймаут, а не $.ready иначе у вебкитов будет бесконечная загрузка
+
+        // Если нет EventSource, то алертуем и выходим
+        if (!window.EventSource) {
+            alert('No EventSource');
+            return;
+        }
+
+        // Получаем имя из localStorage и запрашиваем новое
+        var name = (prompt('Name:', window.localStorage ? window.localStorage['name'] || '' : '') || 'anonymous').substr(0, 20);
+
+        // Пытаемся сохранить имя
+        if (window.localStorage) {
+            window.localStorage['name'] = name;
+        }
+
+        // Создаем EventSource
+        var eventSrc = new EventSource("/stream");
+
+        // Кэшируем ссылки на элементы
+        var $text = $('input');
+        var $chat = $('#chat');
+
+        // Простой эскейпинг строки
+        function escape(str, length) {
+            return str.substr(0, length || -1).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Отрисовка сообщений
+        function renderMessage(data) {
+            $chat.prepend('<div class="' + (data.isbot ? 'bot' : 'human') + '">' +
+                              '<b>' + escape(data.name, 20) + '</b>: <span>' + escape(data.message, 1000) + '</span>' +
+                          '</div>');
+        }
+
+        // Слушаем событие EventSource - "message"
+        eventSrc.addEventListener("message", function(event) {
+            var data = JSON.parse(event.data);
+            // Отрисовываем пришедшее с сервера сообщение
+            renderMessage(data);
+//            alert(data);
+        }, false);
+
+        // Слушаем событие EventSource - "error"
+        eventSrc.addEventListener("error", function(event) {
+            // Сообщаем о проблеме с подключением
+//            alert('connection error');
+            renderMessage({
+                isbot: true,
+                message: 'connection error',
+                name: '@Chat'
+            });
+        }, false);
+
+        // Отправляем новое сообщение по Enter
+        $text.keyup(function (event) {
+           var message = $text.val().substr(0, 1000);
+
+           if (event.which === 13 && message) {
+               $.post('/message', {
+                   message: message,
+                   name: name
+               });
+               $text.val('');
+           }
+        });
+
+    }, 50);/**/
+    </script>
+  </body>
+</html>
